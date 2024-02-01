@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculadora de Enfriamiento de Pasteles</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Enfriamiento de Pasteles</h1>
+        <div>
+            <label for="tempInicial">Temperatura Inicial (°F):</label>
+            <input type="number" id="tempInicial" class="form-control">
+        </div>
+        <div>
+            <label for="tempAmbiente">Temperatura Ambiente (°F):</label>
+            <input type="number" id="tempAmbiente" class="form-control">
+        </div>
+        <div>
+            <label for="tempObjetivo">Temperatura Objetivo (°F):</label>
+            <input type="number" id="tempObjetivo" class="form-control">
+        </div>
+        <button onclick="calcularTiempo()" class="btn btn-primary">Calcular Tiempo</button>
+        <div id="resultado" class="mt-3"></div>
+    </div>
+
+    <script>
+        function calcularConstanteEnfriamiento(tempInicial, tempAmbiente, tempObjetivo) {
+            const constanteEnfriamiento = -Math.log((tempAmbiente - tempInicial) / (tempAmbiente - tempObjetivo)) / 30;
+            return constanteEnfriamiento;
+        }
+
+        function calcularTiempoEnfriamiento(tempInicial, tempAmbiente, tempObjetivo) {
+            const k = calcularConstanteEnfriamiento(tempInicial, tempAmbiente, tempObjetivo);
+            const tiempo = -30 * Math.log((tempObjetivo - tempAmbiente) / (tempInicial - tempAmbiente)) / Math.log(2);
+            return { k, tiempo };
+        }
+
+        function calcularTiempo() {
+            const tempInicial = parseFloat(document.getElementById("tempInicial").value);
+            const tempAmbiente = parseFloat(document.getElementById("tempAmbiente").value);
+            const tempObjetivo = parseFloat(document.getElementById("tempObjetivo").value);
+            const resultadoElement = document.getElementById("resultado");
+
+            if (isNaN(tempInicial) || isNaN(tempAmbiente) || isNaN(tempObjetivo)) {
+                resultadoElement.innerHTML = "<p class='error-message'>Por favor, ingrese valores numéricos en todos los campos.</p>";
+                return;
+            }
+
+            if (tempObjetivo > tempInicial) {
+                resultadoElement.innerHTML = "<p class='error-message'>La temperatura objetivo es mayor que la temperatura inicial. Por favor, ingrese una temperatura objetivo menor.</p>";
+                return;
+            }
+
+            resultadoElement.innerHTML = ""; // Limpiar mensajes de error anteriores
+
+            const { k, tiempo } = calcularTiempoEnfriamiento(tempInicial, tempAmbiente, tempObjetivo);
+
+            resultadoElement.innerHTML = `<p>Para el pastel:</p>
+            <ul>
+                <li>Constante de enfriamiento (k): ${k.toFixed(4)}</li>
+                <li>Tiempo necesario para alcanzar ${tempObjetivo} °F: ${tiempo.toFixed(2)} minutos</li>
+            </ul>`;
+        }
+    </script>
+</body>
+</html>
